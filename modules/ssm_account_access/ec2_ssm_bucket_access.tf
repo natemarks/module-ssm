@@ -18,10 +18,7 @@ resource "aws_iam_role" "access_ssm_bucket_role" {
     }
 EOF
 
-  tags = {
-    terraform = "true"
-    aws_account = "${var.aws_account_id}"
-  }
+  tags = var.tags
 }
 
 resource "aws_iam_policy" "access_ssm_bucket_policy" {
