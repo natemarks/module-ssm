@@ -69,7 +69,7 @@ resource "aws_vpc_endpoint" "ssmmessages" {
 resource "aws_vpc_endpoint" "ec2messages" {
   vpc_id       = data.aws_vpc.selected.id
   security_group_ids = [aws_security_group.ec2messages_vpc_endpoint.id]
-  service_name = "com.amazonaws.${var.aws_region}.ec2messages"
+    service_name = "com.amazonaws.${var.aws_region}.ec2messages"
   vpc_endpoint_type = "Interface"
   tags = var.tags
 }
