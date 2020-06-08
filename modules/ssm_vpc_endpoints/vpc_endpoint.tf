@@ -12,6 +12,8 @@ resource "aws_security_group" "ssm_vpc_endpoint" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  tags = var.tags
+
 }
 
 resource "aws_security_group" "ssmmessages_vpc_endpoint" {
@@ -24,6 +26,7 @@ resource "aws_security_group" "ssmmessages_vpc_endpoint" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  tags = var.tags
 }
 resource "aws_security_group" "ec2messages_vpc_endpoint" {
   vpc_id = var.vpc_id
@@ -35,6 +38,7 @@ resource "aws_security_group" "ec2messages_vpc_endpoint" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  tags = var.tags
 }
 
 data "aws_vpc_endpoint_service" "ssm" {
