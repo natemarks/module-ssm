@@ -1,3 +1,14 @@
+# Create the roles, etc
+module "ssm_account_access" {
+
+  source = "git::git@github.com:natemarks/module-ssm.git//modules/ssm_ec2_profile?ref=v0.0.1"
+
+  aws_region = var.aws_region
+  aws_account_id = var.aws_account_id
+}
+
+
+
 
 #  Locate the instance profile by name
 data "aws_iam_instance_profile" "ssm_managed_instance_profile" {
