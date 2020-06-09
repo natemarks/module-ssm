@@ -58,6 +58,6 @@ resource "aws_iam_role_policy_attachment" "AmazonSSMManagedInstanceCore_attach" 
 }
 
 resource "aws_iam_instance_profile" "access_ssm_bucket_profile" {
-  name = "test_profile"
+  name = "access_ssm_bucket_profile"
   role = aws_iam_role.access_ssm_bucket_role.name
 }
