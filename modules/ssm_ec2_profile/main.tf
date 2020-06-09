@@ -1,5 +1,7 @@
-resource "aws_iam_role" "access_ssm_bucket_role" {
-  name = "access_ssm_bucket_role"
+
+# create the role
+resource "aws_iam_role" "ssm_managed_instance_role" {
+  name = "ssm_managed_instance_role"
   description = "Role to permit EC2 instance access to SSM s3 bucket in a region"
 
   assume_role_policy = <<EOF
@@ -21,8 +23,9 @@ EOF
   tags = var.tags
 }
 
-resource "aws_iam_policy" "access_ssm_bucket_policy" {
-  name = "access_ssm_bucket_policy"
+# create policy to grant access to ssm buckets
+resource "aws_iam_policy" "ssm_s3_bucket_access_policy" {
+  name = "ssm_s3_bucket_access_policy"
   description = "Policy to permit EC2 instance access to SSM s3 bucket in a region"
 
   policy = <<EOF
@@ -47,17 +50,26 @@ resource "aws_iam_policy" "access_ssm_bucket_policy" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "access_ssm_bucket_attach" {
-  role       = aws_iam_role.access_ssm_bucket_role.name
-  policy_arn = aws_iam_policy.access_ssm_bucket_policy.arn
+# Attach the bucket access policy to the role
+resource "aws_iam_role_policy_attachment" "ssm_managed_instance_attach" {
+  role       = aws_iam_role.ssm_managed_instance_role.name
+  policy_arn = aws_iam_policy.ssm_s3_bucket_access_policy.arn
 }
 
+# Attach the AWS managed AmazonSSMManagedInstanceCore policy to the role
 resource "aws_iam_role_policy_attachment" "AmazonSSMManagedInstanceCore_attach" {
-  role       = aws_iam_role.access_ssm_bucket_role.name
+  role       = aws_iam_role.ssm_managed_instance_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-resource "aws_iam_instance_profile" "access_ssm_bucket_profile" {
-  name = "access_ssm_bucket_profile"
-  role = aws_iam_role.access_ssm_bucket_role.name
+# Attach the AWS managed CloudWatchAgentServerPolicy policy to the role
+resource "aws_iam_role_policy_attachment" "CloudWatchAgentServerPolicy_attach" {
+  role       = aws_iam_role.ssm_managed_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+
+# attach the role to the profile. The profile is what will finally be attached to the Ec2 instance
+resource "aws_iam_instance_profile" "ssm_managed_instance_profile" {
+  name = "ssm_managed_instance_profile"
+  role = aws_iam_role.ssm_managed_instance_role.name
 }
