@@ -112,3 +112,10 @@ resource "aws_iam_role_policy_attachment" "manage_ec2_tags_attach" {
   role       = aws_iam_role.ssm_managed_instance_role.name
   policy_arn = aws_iam_policy.manage_ec2_tags.arn
 }
+
+
+# Attach the AWS managed CloudWatchAgentServerPolicy policy to the role
+resource "aws_iam_role_policy_attachment" "AWSCodeCommitReadOnly" {
+  role       = aws_iam_role.ssm_managed_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSCodeCommitReadOnly"
+}
