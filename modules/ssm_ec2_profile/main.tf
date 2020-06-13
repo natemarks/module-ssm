@@ -50,6 +50,34 @@ resource "aws_iam_policy" "ssm_s3_bucket_access_policy" {
 EOF
 }
 
+data "aws_iam_policy_document" "saltstack_codecommit_git_clone" {
+
+  statement {
+    effect    = "Allow"
+    actions   = ["codecommit:BatchGetRepositories"]
+    resources = ["arn:aws:codecommit:${var.aws_region}:${var.aws_account_id}:saltstack"]
+  }
+}
+
+
+resource "aws_iam_policy" "saltstack_codecommit_git_clone" {
+  name   = "permit_clone_from_saltstack_codecommit_repo"
+  policy = data.aws_iam_policy_document.saltstack_codecommit_git_clone.json
+}
+
+data "aws_iam_policy_document" "manage_ec2_tags" {
+  statement {
+    effect    = "Allow"
+    actions   = ["ec2:CreateTags", "ec2:DescribeInstances"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "manage_ec2_tags" {
+  name   = "permit_ec2_to_manage_tags"
+  policy = data.aws_iam_policy_document.manage_ec2_tags.json
+}
+
 # Attach the bucket access policy to the role
 resource "aws_iam_role_policy_attachment" "ssm_managed_instance_attach" {
   role       = aws_iam_role.ssm_managed_instance_role.name
@@ -72,4 +100,15 @@ resource "aws_iam_role_policy_attachment" "CloudWatchAgentServerPolicy_attach" {
 resource "aws_iam_instance_profile" "ssm_managed_instance_profile" {
   name = "ssm_managed_instance_profile"
   role = aws_iam_role.ssm_managed_instance_role.name
+}
+
+
+resource "aws_iam_role_policy_attachment" "saltstack_codecommit_git_clone_attach" {
+  role       = aws_iam_role.ssm_managed_instance_role.name
+  policy_arn = aws_iam_policy.saltstack_codecommit_git_clone.arn
+}
+
+resource "aws_iam_role_policy_attachment" "manage_ec2_tags_attach" {
+  role       = aws_iam_role.ssm_managed_instance_role.name
+  policy_arn = aws_iam_policy.manage_ec2_tags.arn
 }
