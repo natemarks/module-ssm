@@ -165,7 +165,7 @@ EOF
 # --------------
 # ATTACH WRITE_LOG_POLICY
 # ---------------
-resource "aws_iam_role_policy_attachment" "ssm_managed_instance_attach" {
+resource "aws_iam_role_policy_attachment" "write_logs_to_s3_attach" {
   role       = aws_iam_role.ssm_managed_instance_role.name
   policy_arn = aws_iam_policy.write_logs_to_s3.arn
 }
