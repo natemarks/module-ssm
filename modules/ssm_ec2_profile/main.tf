@@ -119,3 +119,53 @@ resource "aws_iam_role_policy_attachment" "AWSCodeCommitReadOnly" {
   role       = aws_iam_role.ssm_managed_instance_role.name
   policy_arn = "arn:aws:iam::aws:policy/AWSCodeCommitReadOnly"
 }
+
+# --------------
+# DAT for S3 LOG BUCKET
+# ---------------
+
+data "aws_s3_bucket" "logs" {
+  tags = {
+    deployment     = "management"
+    service = "logging"
+  }
+}
+
+# --------------
+# WRITE_LOG_POLICY (PERMIT EC2 TO WRITE LOGS TO LOG BUCKET)
+# ---------------
+resource "aws_iam_policy" "write_logs_to_s3" {
+  name = "write_logs_to_s3"
+  description = "Policy to permit EC2 instance access write logs to the logging bucket"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": ["s3:ListBucket"]
+            "Resource": [
+                "${data.aws_s3_bucket.logs.arn}"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": ["s3:GetObject", "s3:PutObject"]
+            "Resource": [
+                "${data.aws_s3_bucket.logs.arn}/*"
+            ]
+        }
+    ]
+}
+
+EOF
+}
+
+# --------------
+# ATTACH WRITE_LOG_POLICY
+# ---------------
+resource "aws_iam_role_policy_attachment" "ssm_managed_instance_attach" {
+  role       = aws_iam_role.ssm_managed_instance_role.name
+  policy_arn = aws_iam_policy.write_logs_to_s3.arn
+}
